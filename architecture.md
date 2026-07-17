@@ -7,7 +7,7 @@ A split-process collaborative editor: a local CLI watches a folder on disk, and 
 ```
   Local machine                         Dokku (rootmab)
   ────────────────────────────          ─────────────────────────────────
-  ~/bin/collab-folder                   https://collab.gakoy.com
+  gakoy-collab                          https://collab.gakoy.com
         │
         ▼
   watcher.js
@@ -39,7 +39,7 @@ A split-process collaborative editor: a local CLI watches a folder on disk, and 
   - On first sync (`onSynced`): if the Yjs doc is empty, pushes the file content into it. Then observes the Yjs text and writes changes back to disk (debounced 300 ms, with a 2 s echo-suppression guard).
 - On local file change (chokidar `change` event): if a HocuspocusProvider is open for that file and the change wasn't self-inflicted, replaces the full Yjs text in a single transaction.
 
-### `relay/src/client.js` → `relay/public/bundle.js` — browser client
+### `src/client.js` → `public/bundle.js` — browser client
 
 Built with **esbuild** into a single `bundle.js` loaded by `index.html`.
 
@@ -49,7 +49,7 @@ Built with **esbuild** into a single `bundle.js` loaded by `index.html`.
 - **CodeMirror 6** editor (`basicSetup` + `oneDark` theme + language extensions + `EditorView.lineWrapping`) is bound to the Yjs text via `y-codemirror.next`.
 - **Awareness** (cursor/presence) is wired through the provider; each browser tab gets a random color and username.
 
-### `~/bin/collab-folder` — CLI entry point
+### `gakoy-collab` — CLI entry point
 
 A 6-line shell wrapper: resolves the folder path and relay URL, then `exec node watcher.js "$FOLDER" "$RELAY"`.
 
@@ -78,6 +78,6 @@ Hocuspocus uses its own WebSocket protocol (not the standard `y-websocket` proto
 
 ## Deployment
 
-- Relay: Dokku app `collab` on `rootmab`, domain `collab.gakoy.com`, TLS via Let's Encrypt.
-- Deploy: `cd relay && git push dokku main` (Dockerfile multi-stage build: esbuild bundle in build stage, production image only has runtime deps + pre-built `public/`).
-- Watcher: no install needed beyond the parent repo's `node_modules`; `~/bin/collab-folder` is in `$PATH`.
+- Client: [`monperrus/collab`](https://github.com/monperrus/collab), published as `@gakoy/collab` with the `gakoy-collab` command.
+- Relay: [`monperrus/collab-relay`](https://github.com/monperrus/collab-relay), deployed as Dokku app `collab` on `rootmab`, domain `collab.gakoy.com`, TLS via Let's Encrypt. Deploy with `git push dokku main`.
+- Notes: [`monperrus/collab-notes`](https://github.com/monperrus/collab-notes).
